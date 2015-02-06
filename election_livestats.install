@@ -1,0 +1,65 @@
+<?php
+/**
+ * @file
+ * Install functions for the Election Live Statistics module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function election_livestats_schema() {
+  $schema['election_livestats_eligibility'] = array(
+    'description' => 'Tracks users general eligibility in elections.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary Key: identifier for an eligibility record.',
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The {users}.uid for this user.',
+      ),
+      'election_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The {election}.election_id for this election.',
+      ),
+      'eligible' => array(
+        'description' => 'Whether user is eligible to vote for any position in the election.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'size' => 'tiny',
+        'default' => 0,
+        'not null' => TRUE,
+      ),
+      'import_id' => array(
+        'description' => 'Batch import identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'election_id' => array('election_id'),
+    ),
+    'foreign keys' => array(
+      'user' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+      'election' => array(
+        'table' => 'election',
+        'columns' => array('election_id' => 'election_id'),
+      ),
+    ),
+  );
+  return $schema;
+}
