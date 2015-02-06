@@ -1,0 +1,14 @@
+{
+  "name": "election_livestats_node",
+  "version": "0.0.0",
+  "description": "Serves election statistics from redis.",
+  "main": "app.js",
+  "dependencies": {
+    "redis": "^0.10.3",
+    "socket.io": "^1.0.2"
+  },
+  "scripts": {
+    "postinstall": "find node_modules/ -name '*.info' -type f -delete"
+  },
+  "author": "Sam Gaus"
+}

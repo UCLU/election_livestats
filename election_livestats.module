@@ -1,0 +1,325 @@
+<?php
+/**
+ * @file
+ * Main module file for the election_livestats module
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function election_livestats_menu() {
+  $items = array();
+
+  $items['election/%election/stats'] = array(
+    'title' => t('Live Statistics'),
+    'page callback' => 'election_livestats_page',
+    'page arguments' => array(1),
+    'access callback' => 'election_access',
+    'access arguments' => array('view', 1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 8,
+    'file' => 'election_livestats.page.inc',
+  );
+
+  $items['election/%election/stats/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'load arguments' => array('%map', '%index'),
+  );
+
+  $items['election/%election/stats/actions'] = array(
+    'title' => 'Actions',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('election_livestats_actions_form', 1),
+    'access arguments' => array('administer elections'),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'election_livestats.actions.inc',
+  );
+
+  $items['admin/config/election/livestats'] = array(
+    'title' => t('Live Statistics'),
+    'description' => t('Configure settings for live statistics.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('election_livestats_config_form'),
+    'access arguments' => array('administer elections'),
+    'file' => 'election_livestats.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Returns a prefixed redis key name for a given key string and election id.
+ */
+function election_livestats_get_redis_key($election, $key) {
+
+  $prefix = "election_livestats";
+
+  return $prefix . "-" . $election . "-" . $key;
+
+}
+
+/**
+ * Returns a reference to the redis client.
+ */
+function election_livestats_get_redis_client() {
+
+  $redis = new Redis();
+  $connected = $redis->connect('127.0.0.1');
+
+  if (!$connected) {
+
+    watchdog("election_livestats", "Redis is not running", array(), WATCHDOG_ERROR);
+
+  }
+
+  return $redis;
+}
+
+/**
+ * Returns an array of metric names and their classes.
+ */
+function election_livestats_metrics() {
+  $metrics = array();
+  drupal_alter(__FUNCTION__, $metrics);
+  return $metrics;
+}
+
+/**
+ * Handles a vote or undone vote.
+ */
+function election_livestats_handle_vote($method, $account, $post, $election, $timestamp = NULL) {
+
+  // Connect to Redis.
+  $redis = election_livestats_get_redis_client();
+
+  // Find if this account has voted in this election.
+  $has_voted = (bool) db_query_range("SELECT 1 FROM {election_ballot} WHERE `election_id` = :election_id AND `uid` = :uid AND `valid` = 1 AND `post_id` <> :post_id AND `timestamp` < :timestamp", array(
+    ':election_id' => $election->election_id,
+    ':uid' => $account->uid,
+    ':post_id' => $post->post_id,
+    ':timestamp' => $timestamp ? $timestamp : REQUEST_TIME,
+  ), 0, 1)->fetchField();
+
+  // Add this data to the account object so it can be accessed by metrics.
+  $account->has_voted = $has_voted;
+
+  // Update Redis for each metric.
+  foreach (election_livestats_metrics() as $class_name) {
+    $metric = new $class_name();
+    $metric->setAccount($account);
+
+    // Construct redis key from metric name.
+    $key = election_livestats_get_redis_key($election->election_id, $metric->getName());
+
+    // Note that this will return false if the key does not exist.
+    $data = json_decode($redis->get($key), TRUE);
+
+    // Pass data to the metric and save the result
+    $new_data = $metric->$method($data);
+
+    $redis->set($key, json_encode($new_data));
+
+    $redis->publish('election_livestats', json_encode(array(
+      "election" => $election->election_id,
+      "metric" => $metric->getName(),
+    )));
+
+  }
+
+}
+
+/**
+ * Implements hook_election_vote_vote().
+ */
+function election_livestats_election_vote_vote($account, $post, $election) {
+
+  election_livestats_handle_vote("increment", $account, $post, $election);
+
+}
+
+/**
+ * Implements hook_election_vote_undo().
+ */
+function election_livestats_election_vote_undo($account, $post, $election) {
+
+  election_livestats_handle_vote("decrement", $account, $post, $election);
+
+}
+
+//@todo Consider abstainers: they are voters but they don't vote
+
+/**
+ * Caches metric totals to Redis
+ */
+function election_livestats_form_cache_meta($form, &$form_state) {
+  $election = $form_state['build_info']['args'][0];
+
+  election_livestats_cache_meta($election);
+
+  drupal_set_message(t('The metadata was successfully cached.'));
+}
+
+function election_livestats_cache_meta($election) {
+
+  $election_id = $election->election_id;
+
+  $redis = election_livestats_get_redis_client();
+
+  foreach (election_livestats_metrics() as $class_name) {
+
+    $metric = new $class_name();
+
+    $name = $metric->getName();
+    $label = $metric->getLabel();
+    $type = $metric->getType();
+    $total = $metric->total($election);
+
+    $meta = array(
+      "name" => $name,
+      "label" => $label,
+      "type" => $type,
+    );
+
+    if ($total !== FALSE) {
+      $meta["total"] = $total;
+    }
+
+    $key = election_livestats_get_redis_key($election_id, "meta-{$name}");
+
+    $redis->set($key, json_encode($meta));
+
+  }
+
+}
+
+/**
+ * Deletes all Redis keys in given election.
+ */
+function election_livestats_form_flush_meta($form, &$form_state) {
+  $election = $form_state['build_info']['args'][0];
+
+  election_livestats_flush_meta($election);
+
+  drupal_set_message(t('The metadata was successfully flushed.'));
+}
+
+function election_livestats_flush_meta($election) {
+
+  $election_id = $election->election_id;
+
+  $redis = election_livestats_get_redis_client();
+
+  $prefix = election_livestats_get_redis_key($election_id, "*");
+
+  $keys = $redis->keys($prefix);
+
+  $redis->delete($keys);
+
+}
+
+/**
+ * Caches user eligibility to vote
+ */
+function election_livestats_form_cache_eligibility($form, &$form_state) {
+  $election = $form_state['build_info']['args'][0];
+
+  return election_livestats_cache_eligibility($election);
+}
+
+function election_livestats_cache_eligibility($election) {
+
+  /**
+   * @todo: This should scale with processing power of computer (i.e. maximum
+   * number of users that can be loaded via user_load_multiple in 30 seconds
+   * (maximum execution time). This number works on my PC, but ideally we
+   * would find some way to determine the best size programatically
+   */
+  $chunk_size = 1500;
+
+  // Choose a new import id
+  $import_id = db_query("SELECT MAX(import_id) as import_id FROM {election_livestats_eligibility}")->fetchField() + 1;
+
+  // For a member to be counted as able to vote they need to pass at least
+  // one eligibility criterion.
+  // First we'll collect together all the criteria to then test against
+  // each member.
+
+  $posts = election_post_load_by_election($election);
+  $election_id = $election->election_id;
+
+  // List of unique roles required
+  $roles = array_reduce($posts, function ($results, $post) {
+    return (array) $results[0] + array_combine($post->rids, $post->rids);
+  });
+
+  // Select users from these roles.
+  $user_query = db_select('users', 'u');
+  $user_query->leftJoin('users_roles', 'ur', 'u.uid = ur.uid');
+  $user_query->condition('ur.rid', $roles);
+  $user_query->addField('u', 'uid');
+  $user_query->groupBy('uid');
+
+  $users_chunks = array_chunk($user_query->execute()->fetchCol(), $chunk_size);
+
+  // Prepare a batch operation to check voting eligibility for each user.
+  $batch = array(
+    'title' => t('Calculating election eligibility.'),
+    'file' => drupal_get_path('module', 'election_livestats') . basename(__FILE__),
+    'operations' => array(),
+    'init_message' => t('Initialising eligibility caching.'),
+    'progress_message' => t('Processed @current chunk out of @total.'),
+    'error_message' => t('An error occurred during processing'),
+    'finished' => '_election_livestats_cache_eligibility_finished',
+  );
+
+  // Build the operations array.
+  foreach ($users_chunks as $users_chunk) {
+    $batch['operations'][] = array('_election_livestats_cache_eligibility_process', array($election_id, $import_id, $users_chunk, $posts));
+  }
+
+  // Start the batch process.
+  batch_set($batch);
+
+  // Process the batch from Drush if applicable.
+  if (drupal_is_cli() && function_exists('drush_main')) {
+    drush_backend_batch_process();
+  }
+}
+
+function _election_livestats_cache_eligibility_process($election_id, $import_id, $users_chunk, $posts, &$context) {
+
+  $query = db_insert('election_livestats_eligibility')->fields(array(
+    'uid', 'election_id', 'eligible', 'import_id'
+  ));
+
+  $users = user_load_multiple($users_chunk);
+
+  foreach ($users as $user) {
+    foreach ($posts as $post) {
+      $test = election_vote_access_test('vote', $post, $user, FALSE);
+      if ($test) {
+        // If this user passes any condition, we can break.
+        $query->values(array(
+          'uid' => $user->uid,
+          'election_id' => $election_id,
+          'eligible' => TRUE,
+          'import_id' => $import_id
+        ));
+        break;
+      }
+    }
+  }
+
+  $query->execute();
+}
+
+function _election_livestats_cache_eligibility_finished($success, $results, $operations) {
+  if ($success) {
+    drupal_set_message(t('Eligibility was successfully cached.'));
+  }
+  else {
+    drupal_set_message(t('Error(s) occurred during eligibility caching.'), 'error');
+  }
+}
