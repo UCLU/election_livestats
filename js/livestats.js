@@ -97,7 +97,9 @@
     });
 
     // Set up socket for updating data for this election.
-    var socket = io.connect('https://awd-dev.uclu.org:3000/');
+    // `socket_io_url` is set through inline JavaScript included in the
+    // page callback.
+    var socket = io.connect(socket_io_url);
     socket.emit('subscribe', election_id);
 
     // Respond to update packets form the websocket.

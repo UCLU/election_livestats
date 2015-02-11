@@ -143,10 +143,11 @@ function election_livestats_page($election) {
   $module_location = drupal_get_path('module', 'election_livestats');
 
   // Socket.io variables
+  $prot = variable_get("election_livestats_ssl", TRUE) ? "https" : "http";
   $host = variable_get("election_livestats_host", parse_url($GLOBALS['base_url'], PHP_URL_HOST));
   $port = variable_get("election_livestats_port", 3000);
 
-  $socket_io_url = 'https://' . $host . ':' . $port;
+  $socket_io_url = $prot . "://" . $host . ':' . $port;
 
   // Pass some variables to javascript.
   drupal_add_js("var election_id = '{$election->election_id}', socket_io_url = '{$socket_io_url}', initial_data = {$metrics_json};", array(
