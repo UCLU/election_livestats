@@ -6,10 +6,19 @@ var https = require('https');
 var fs = require('fs');
 
 // Configure our HTTPS server to use our keys and certs.
-var server = https.createServer({
-  key: fs.readFileSync(config.ssl.key),
-  cert: fs.readFileSync(config.ssl.cert)
-});
+try {
+  var server = https.createServer({
+    key: fs.readFileSync(config.ssl.key),
+    cert: fs.readFileSync(config.ssl.cert)
+  });
+} catch (e) {
+  if (e.errno === 3) {
+    console.log("Your SSL key or certificate cannot be read. If they are in a read-protected directory, you will need to run the application with sudo (or equivalent).");
+  } else {
+    console.dir(e);
+  }
+  process.exit(1);
+}
 
 // Start HTTPS and socket.io
 var io = sio.listen(server);
