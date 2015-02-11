@@ -1,22 +1,7 @@
-// Configuration.
-var config = {
-
-  "prefix": "election_livestats",
-  "redis": {
-    "port": 6379,
-    "host": "127.0.0.1"
-  },
-  "port": 3000,
-  "ssl": {
-    "key": "/etc/ssl/private/uclu.org.key",
-    "cert": "/etc/ssl/private/uclu.org.crt"
-  }
-
-}
-
-// Require dependant libraries (and spin up socket.io).
+// Require dependant libraries and config
+var config = require('./config.json');
 var redis = require('redis');
-var sio = require('socket.io')
+var sio = require('socket.io');
 var https = require('https');
 var fs = require('fs');
 
