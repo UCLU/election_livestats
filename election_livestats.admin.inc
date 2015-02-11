@@ -22,6 +22,13 @@ function election_livestats_config_form($form, &$form_state) {
     '#default_value' => variable_get('election_livestats_port', 3000),
   );
 
+  $form['election_livestats_ssl'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use SSL'),
+    '#description' => t('Check to use https to connect.'),
+    '#default_value' => variable_get('election_livestats_ssl', TRUE),
+  );
+
   return system_settings_form($form);
 
 };
