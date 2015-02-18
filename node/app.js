@@ -22,14 +22,26 @@ try {
   process.exit(1);
 }
 
-// Start HTTPS and socket.io
-var io = sio.listen(server);
-server.listen(config.port);
-
 // We need to have two connections, one for subscribing and one for regular
 // access.
-var subscriber = redis.createClient(config.redis.port, config.redis.host);
-var regular = redis.createClient(config.redis.port, config.redis.host);
+try {
+  var subscriber = redis.createClient(config.redis.port, config.redis.host);
+  var regular = redis.createClient(config.redis.port, config.redis.host);
+} catch (e) {
+  console.log("There was an error connecting to Redis.");
+  process.exit(1);
+}
+
+// Start HTTPS and socket.io
+var io = sio.listen(server);
+server.listen(config.port, "localhost", function(error) {
+  if(error) {
+    console.log("Could not start websocket server.");
+    process.exit(1);
+  } else {
+    console.log("Websocket server started successfully!");
+  }
+});
 
 // Initiate a job queue.
 var q = new Queue();
