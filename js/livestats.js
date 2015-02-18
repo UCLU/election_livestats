@@ -48,7 +48,9 @@
           colors: ['#582c83'],
           credits: false,
           title: false,
-          legend: false,
+          legend: {
+            enabled: false
+          },
           chart: {
             backgroundColor: 'transparent',
             type: 'bar'

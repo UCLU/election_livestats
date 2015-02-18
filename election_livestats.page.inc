@@ -156,7 +156,7 @@ function election_livestats_page($election) {
 
   // Load the rest of the JavaScript.
   drupal_add_js($socket_io_url . '/socket.io/socket.io.js');
-  drupal_add_js('https://code.highcharts.com/highcharts.js');
+  drupal_add_js($module_location . '/js/highcharts.js');
   drupal_add_js($module_location . '/js/livestats.js');
 
   return array(
