@@ -161,7 +161,11 @@ function election_livestats_form_cache_meta($form, &$form_state) {
   drupal_set_message(t('The metadata was successfully cached.'));
 }
 
-function election_livestats_cache_meta($election) {
+function election_livestats_cache_meta($election, &$context = NULL) {
+
+  if($context) {
+    $context['message'] = "Calculating metadata for metrics.";
+  }
 
   $election_id = $election->election_id;
 
@@ -265,11 +269,11 @@ function election_livestats_cache_eligibility($election) {
 
   // Prepare a batch operation to check voting eligibility for each user.
   $batch = array(
-    'title' => t('Calculating election eligibility.'),
+    'title' => t('Calculating election eligibility and metadata.'),
     'file' => drupal_get_path('module', 'election_livestats') . basename(__FILE__),
     'operations' => array(),
-    'init_message' => t('Initialising eligibility caching.'),
-    'progress_message' => t('Processed @current chunk out of @total.'),
+    'init_message' => t('Initialising caching.'),
+    'progress_message' => t('Processed @current steps out of @total.'),
     'error_message' => t('An error occurred during processing'),
     'finished' => '_election_livestats_cache_eligibility_finished',
   );
@@ -278,6 +282,8 @@ function election_livestats_cache_eligibility($election) {
   foreach ($users_chunks as $users_chunk) {
     $batch['operations'][] = array('_election_livestats_cache_eligibility_process', array($election_id, $import_id, $users_chunk, $posts));
   }
+
+  $batch['operations'][] = array('election_livestats_cache_meta', array($election));
 
   // Start the batch process.
   batch_set($batch);
@@ -289,6 +295,8 @@ function election_livestats_cache_eligibility($election) {
 }
 
 function _election_livestats_cache_eligibility_process($election_id, $import_id, $users_chunk, $posts, &$context) {
+
+  $context['message'] = "Caching voter eligibility.";
 
   $query = db_insert('election_livestats_eligibility')->fields(array(
     'uid', 'election_id', 'eligible', 'import_id'
@@ -317,9 +325,9 @@ function _election_livestats_cache_eligibility_process($election_id, $import_id,
 
 function _election_livestats_cache_eligibility_finished($success, $results, $operations) {
   if ($success) {
-    drupal_set_message(t('Eligibility was successfully cached.'));
+    drupal_set_message(t('Eligibility and metadata were successfully cached.'));
   }
   else {
-    drupal_set_message(t('Error(s) occurred during eligibility caching.'), 'error');
+    drupal_set_message(t('Error(s) occurred during caching.'), 'error');
   }
 }

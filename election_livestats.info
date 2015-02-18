@@ -13,5 +13,4 @@ files[] = election_livestats.page.inc
 files[] = exception.inc
 files[] = metricinterface.inc
 files[] = metricbase.inc
-
 files[] = metrictotalvotes.inc
