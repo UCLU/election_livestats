@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // Require dependant libraries and config
 var config = require('./config.json');
 var redis = require('redis');
@@ -103,13 +105,13 @@ function Queue() {
 
   var queued = [];
 
-  this.add = function(unique, callback) { 
+  this.add = function(unique, callback) {
 
     var time;
 
     var getTimeLeft = function(timeout) {
       return timeout._idleStart + timeout._idleTimeout - Date.now();
-    }; 
+    };
 
     if(queued[unique] !== undefined) {
 
