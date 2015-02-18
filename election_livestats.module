@@ -81,7 +81,7 @@ function election_livestats_get_redis_client() {
  * Returns an array of metric names and their classes.
  */
 function election_livestats_metrics() {
-  $metrics = array();
+  $metrics = array('ElectionLiveStatsMetricTotalVotes');
   drupal_alter(__FUNCTION__, $metrics);
   return $metrics;
 }

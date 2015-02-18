@@ -15,7 +15,3 @@ files[] = metricinterface.inc
 files[] = metricbase.inc
 
 files[] = metrictotalvotes.inc
-files[] = metrictotalvoters.inc
-files[] = metricclubssocieties.inc
-files[] = metricstudymode.inc
-files[] = metricfaculty.inc
