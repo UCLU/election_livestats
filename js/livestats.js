@@ -74,7 +74,12 @@
             lineColor: 'transparent',
             tickLength: 0,
             tickInterval: 1,
-            type: 'category'
+            type: 'category',
+            labels: {
+              style: {
+                fontSize: '14px',
+              }
+            }
           },
           yAxis: {
             gridLineWidth: 0,
