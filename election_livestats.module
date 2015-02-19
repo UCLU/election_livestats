@@ -79,11 +79,28 @@ function election_livestats_get_redis_client() {
 
 /**
  * Returns an array of metric names and their classes.
+ *
+ * @todo Is it better/more Drupaly for this to return the array column
+ * or should it return the weighted array.
  */
 function election_livestats_metrics() {
-  $metrics = array('ElectionLiveStatsMetricTotalVotes');
+  // Default metrics changeable with hook_alter.
+  $metrics = array(
+    array(
+      'name' => 'ElectionLiveStatsMetricTotalVotes',
+    ),
+  );
   drupal_alter(__FUNCTION__, $metrics);
-  return $metrics;
+
+  // Sort metrics by weight (no weight is zero).
+  $weights = array();
+  foreach ($metrics as $key => $row) {
+    $weights[$key] = (isset($row['weight'])) ? $row['weight'] : 0;
+  }
+  array_multisort($weights, array_keys($metrics), $metrics);
+
+  // Return flat array of class names.
+  return array_column($metrics, 'name');
 }
 
 /**
