@@ -7,7 +7,7 @@
 class ElectionLiveStatsMetricTotalVotes extends ElectionLiveStatsMetricBase {
 
   protected $name = 'total_votes';
-  protected $label = 'Total votes';
+  protected $label = 'Votes cast';
   protected $type = 'count';
 
   public function increment($data) {
