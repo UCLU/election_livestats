@@ -119,6 +119,8 @@
 
     if(metric.type === "single") {
 
+      var height = 80;
+
       var value = metric.value;
       var total = metric.total;
 
@@ -132,10 +134,12 @@
       }];
 
       var chart = $('.chart', section).highcharts()
-
       chart.series[0].setData(data);
+      chart.setSize(chart.chartWidth, height);
 
     } else if(metric.type === "grouped") {
+
+      var height = 40 * Object.keys(metric.total).length;
 
       var data = [];
 
@@ -167,20 +171,12 @@
 
       var el = $('.chart', section);
       var chart = el.highcharts();
-
       chart.series[0].setData(data);
-
-      // If there are more than 28 categories of data, scale the height
-      // appropriately and then wrap in a scroller.
-      if(data.length > 26) {
-        var height = (chart.chartHeight / 26) * data.length;
-        el.wrap('<div class="content-scroll" style="height: 300px; overflow-y: scroll; overflow-x:hidden;"></div>');
-        chart.setSize(chart.chartWidth, height);
-      }
+      chart.setSize(chart.chartWidth, height);
 
     } else if(metric.type === "count") {
 
-      section.children[1].innerText = metric.value;
+      section.children[1].textContent = metric.value;
 
     }
 
