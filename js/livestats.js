@@ -21,7 +21,6 @@
         if(metric.type === "single" || metric.type === "grouped") {
 
           $chart.highcharts({
-            colors: ['#582c83'],
             credits: false,
             title: false,
             legend: {
@@ -36,6 +35,7 @@
                 groupPadding: 0
               },
               bar: {
+                grouping: false,
                 borderWidth: 0
               }
             },
@@ -69,6 +69,11 @@
               max: 1,
             },
             series: [{
+              color: '#dddddd',
+              enableMouseTracking: false,
+              data: []
+            }, {
+              color: '#582c83',
               data: []
             }]
           });
@@ -115,12 +120,15 @@
           }];
 
           var chart = $('.chart', $section).highcharts()
-          chart.series[0].setData(data);
+          chart.series[0].setData([{ y: 1 }]);
+          chart.series[1].setData(data);
+
           chart.setSize(chart.chartWidth, height);
         } else if(metric.type === "grouped") {
           var height = 40 * Object.keys(metric.total).length;
 
           var data = [];
+          var bg = [];
 
           for(var id in metric.total) {
 
@@ -135,6 +143,7 @@
               label: value + '/' + total + ' (' + Math.round(ratio*100) + '%)',
               y: ratio
             });
+            bg.push({ y: 1 });
           }
 
           data.sort(function(a, b) {
@@ -148,7 +157,8 @@
           });
 
           var chart = $('.chart', $section).highcharts();
-          chart.series[0].setData(data);
+          chart.series[0].setData(bg);
+          chart.series[1].setData(data);
           chart.setSize(chart.chartWidth, height);
         } else if(metric.type === "count") {
           $section.children().eq(1).text(metric.value);
