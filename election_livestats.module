@@ -11,7 +11,7 @@ function election_livestats_menu() {
   $items = array();
 
   $items['election/%election/stats'] = array(
-    'title' => t('Live Statistics'),
+    'title' => 'Live Statistics',
     'page callback' => 'election_livestats_page',
     'page arguments' => array(1),
     'access callback' => 'election_access',
@@ -38,8 +38,8 @@ function election_livestats_menu() {
   );
 
   $items['admin/config/election/livestats'] = array(
-    'title' => t('Live Statistics'),
-    'description' => t('Configure settings for live statistics.'),
+    'title' => 'Live Statistics',
+    'description' => 'Configure settings for live statistics.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('election_livestats_config_form'),
     'access arguments' => array('administer elections'),
@@ -180,7 +180,7 @@ function election_livestats_form_cache_meta($form, &$form_state) {
 
 function election_livestats_cache_meta($election, &$context = NULL) {
 
-  if($context) {
+  if ($context) {
     $context['message'] = "Calculating metadata for metrics.";
   }
 
@@ -252,7 +252,7 @@ function election_livestats_form_cache_eligibility($form, &$form_state) {
 function election_livestats_cache_eligibility($election) {
 
   /**
-   * @todo: This should scale with processing power of computer (i.e. maximum
+   * @todo This should scale with processing power of computer (i.e. maximum
    * number of users that can be loaded via user_load_multiple in 30 seconds
    * (maximum execution time). This number works on my PC, but ideally we
    * would find some way to determine the best size programatically
