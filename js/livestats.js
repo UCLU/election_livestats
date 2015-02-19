@@ -7,32 +7,20 @@
     attach: function (context, settings) {
 
       // As we are clearly running JavaScript, prepare the scene for the live statistics.
-      var statistics = document.createElement("div");
-      var noscript = document.getElementById('noscript-statistics');
-      statistics.setAttribute('id', 'statistics');
-      noscript.parentElement.insertBefore(statistics, noscript);
-      noscript.parentElement.removeChild(noscript);
+      var $statistics = $("<div id='statistics'>");
+      $('#noscript-statistics').after($statistics).remove();
 
       // Run through the initial data to create the charts for each metric
       initial_data.forEach(function(metric){
 
-        var id = 'section-' + metric.name;
-        var section = document.createElement("div");
-        section.setAttribute('id', id);
+        var $section = $("<div>").attr('id', 'section-' + metric.name).appendTo($statistics);
+        $("<h2>").text(metric.label).appendTo($section);
 
-        var title = document.createElement("h2");
-        title.textContent = metric.label;
-        section.appendChild(title);
-
-        var chart = document.createElement("div");
-        chart.classList.add("chart");
-        section.appendChild(chart);
-
-        statistics.appendChild(section);
+        var $chart = $("<div>").addClass("chart").appendTo($section);
 
         if(metric.type === "single" || metric.type === "grouped") {
 
-          $(chart).highcharts({
+          $chart.highcharts({
             colors: ['#582c83'],
             credits: false,
             title: false,
@@ -105,11 +93,11 @@
 
         });
       } catch (e) {
-        $("#statistics").before('<div class="messages error">The live statistics server is currently not running</b>. Please refresh this page for updates!</div>');
+        $statistics.before('<div class="messages error">The live statistics server is currently not running</b>. Please refresh this page for updates!</div>');
       }
 
       function update(metric) {
-        var section = document.getElementById('section-' + metric.name);
+        var $section = $('#section-' + metric.name);
 
         if(metric.type === "single") {
           var height = 80;
@@ -126,7 +114,7 @@
             y: ratio
           }];
 
-          var chart = $('.chart', section).highcharts()
+          var chart = $('.chart', $section).highcharts()
           chart.series[0].setData(data);
           chart.setSize(chart.chartWidth, height);
         } else if(metric.type === "grouped") {
@@ -159,12 +147,11 @@
             }
           });
 
-          var el = $('.chart', section);
-          var chart = el.highcharts();
+          var chart = $('.chart', $section).highcharts();
           chart.series[0].setData(data);
           chart.setSize(chart.chartWidth, height);
         } else if(metric.type === "count") {
-          section.children[1].textContent = metric.value;
+          $section.children().eq(1).text(metric.value);
         }
 
 
