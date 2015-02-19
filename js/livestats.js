@@ -87,8 +87,6 @@
 
         }
 
-        $('body').trigger('election_livestats_ready');
-
         update(metric);
 
       });
