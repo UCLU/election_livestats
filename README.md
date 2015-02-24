@@ -9,6 +9,7 @@ Requirements
 * Node.js (or io.js)
 * npm
 * Redis
+* [phpredis](https://github.com/phpredis/phpredis)
 
 Installation
 ------------
