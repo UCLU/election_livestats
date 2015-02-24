@@ -14,7 +14,7 @@ function election_livestats_menu() {
     'title' => 'Live Statistics',
     'page callback' => 'election_livestats_page',
     'page arguments' => array(1),
-    'access callback' => 'election_livestats_show',
+    'access callback' => 'election_livestats_view',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 8,
@@ -58,7 +58,7 @@ function election_livestats_menu() {
  * @return bool
  *   TRUE if visible, FALSE if not visible.
  */
-function election_livestats_show($election) {
+function election_livestats_view($election) {
   // Any point after the voting has opened, subject to election_access.
   // Election administrators will always be able to see the livestats page.
   return user_access('administer elections') || (election_access('view', $election) && election_livestats_metadata_exists($election) && (REQUEST_TIME >= $election->vopen_time));
