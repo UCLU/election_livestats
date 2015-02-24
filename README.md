@@ -22,9 +22,9 @@ Installation
 Configuration
 -------------
 
-This module requires metrics to be implemented via `hook_election_livestats_metrics_alter`. An example metric "Total votes" is included by way of example.
+This module requires metrics to be implemented via `hook_election_livestats_metrics_alter`. An example metric "Total votes" is included by way of example. Documentation on the structure of metric classes is to come.
 
-Documentation on the structure of metric classes is to come.
+There is also a "view election live statistics" permission that you will need to configure before the live statistics page is visible.
 
 
 Running

@@ -54,14 +54,28 @@ function election_livestats_menu() {
  *
  * @param object $election
  *   The election object.
+ * @param object $account
+ *   The user to check for. Leave it to NULL to check for the global user.
  *
  * @return bool
  *   TRUE if visible, FALSE if not visible.
  */
-function election_livestats_view($election) {
+function election_livestats_view($election, $account = NULL) {
+  if (empty($account)) {
+    $account = $GLOBALS['user'];
+  }
   // Any point after the voting has opened, subject to election_access.
   // Election administrators will always be able to see the livestats page.
-  return user_access('administer elections') || (election_access('view', $election) && election_livestats_metadata_exists($election) && (REQUEST_TIME >= $election->vopen_time));
+  return user_access('administer elections') || (user_access('view election live statistics', $account) && election_access('view', $election) && election_livestats_metadata_exists($election) && (REQUEST_TIME >= $election->vopen_time));
+}
+
+function election_livestats_permission() {
+  return array(
+    'view election live statistics' => array(
+      'title' => t("View live statistics for an election"),
+      'description' => t("This permission allows the user to view live statistics of elections, subject to the user's ability to view the election itself."),
+    ),
+  );
 }
 
 /**
