@@ -7,7 +7,7 @@
 function election_livestats_page($election) {
 
   // If the metadata does not exist, alert the user
-  if (!election_livestats_meta_exists($election)) {
+  if (!election_livestats_metadata_exists($election)) {
     drupal_set_message(t('Metadata for live statistics have not been built for this election.'), 'warning');
     return array();
   }
