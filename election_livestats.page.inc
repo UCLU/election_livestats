@@ -4,6 +4,9 @@
  * Page to display Election Live Stats.
  */
 
+/**
+ * Page callback for showing election livestats.
+ */
 function election_livestats_page($election) {
 
   // If the metadata does not exist, alert the user

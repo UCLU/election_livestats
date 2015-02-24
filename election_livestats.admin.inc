@@ -4,6 +4,9 @@
  * Forms for configuring Election Live Stats.
  */
 
+/**
+ * Implements hook_form().
+ */
 function election_livestats_config_form($form, &$form_state) {
 
   drupal_set_title(t("Configure Live Statistics"), PASS_THROUGH);
