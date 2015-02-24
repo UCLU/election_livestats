@@ -29,6 +29,7 @@ Documentation on the structure of metric classes is to come.
 
 Running
 -------
+
 * Start Redis server.
 * Start the `app.js` file in the `node/` subdirectory of the module.<br />*Note: If the certificates are in a read-protected directory, the app will need to be run in `sudo`*.
 * For every election for which you want to have live statistics, you will need go to `election/%election_id/stats/actions` and `Cache eligibility and metadata.`. Depending on your electorate size, this may take some time.
@@ -38,3 +39,8 @@ Running
 Ideally the Node.js app should run as a service on the server, so start it as a daemon or service in the way you prefer. I would recommend using [PM2](https://github.com/Unitech/PM2/) to monitor the app, running `pm2 startup` to start it on boot.
 
 Alternatively, the upstart script `node/election_livestats_node.conf` is included in this repository. To use it, change the directory in the `script` section to point to your `election_livestats` folder and then copy it to `/etc/init/`.
+
+Security Considerations
+-----------------------
+
+Please note that currently there is no authentication on the websocket server. As a result, even if your election is only visible to certain users, anyone could connect to the websocket server and receive live statistics updates.
