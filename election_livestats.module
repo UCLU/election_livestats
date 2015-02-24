@@ -14,8 +14,8 @@ function election_livestats_menu() {
     'title' => 'Live Statistics',
     'page callback' => 'election_livestats_page',
     'page arguments' => array(1),
-    'access callback' => 'election_access',
-    'access arguments' => array('view', 1),
+    'access callback' => 'election_livestats_show',
+    'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 8,
     'file' => 'election_livestats.page.inc',
@@ -47,6 +47,21 @@ function election_livestats_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Determine whether live stats should be visible for an election.
+ *
+ * @param object $election
+ *   The election object.
+ *
+ * @return bool
+ *   TRUE if visible, FALSE if not visible.
+ */
+function election_livestats_show($election) {
+  // Any point after the voting has opened, subject to election_access.
+  // Election administrators will always be able to see the livestats page.
+  return user_access('administer elections') || (election_access('view', $election) && election_livestats_meta_exists($election) && (REQUEST_TIME >= $election->vopen_time));
 }
 
 /**
@@ -213,6 +228,19 @@ function election_livestats_cache_meta($election, &$context = NULL) {
 
   }
 
+  $key = election_livestats_get_redis_key($election_id, "cached");
+
+  $redis->set($key, TRUE);
+
+}
+
+/**
+ * Determines whether metadata has been cached for a given election.
+ */
+function election_livestats_meta_exists($election) {
+  $redis = election_livestats_get_redis_client();
+  $metakey = election_livestats_get_redis_key($election->election_id, "cached");
+  return (bool) $redis->get($metakey);
 }
 
 /**

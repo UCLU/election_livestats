@@ -6,6 +6,12 @@
 
 function election_livestats_page($election) {
 
+  // If the metadata does not exist, alert the user
+  if (!election_livestats_meta_exists($election)) {
+    drupal_set_message(t('Metadata for live statistics have not been built for this election.'), 'warning');
+    return array();
+  }
+
   // Disable the cache on this page as it is based on live data.
   $GLOBALS['conf']['cache'] = FALSE;
 
@@ -42,12 +48,6 @@ function election_livestats_page($election) {
     // Get the total possible value for this metric.
     $metakey = election_livestats_get_redis_key($election->election_id, "meta-{$name}");
     $meta = json_decode($redis->get($metakey), TRUE);
-
-    // If the metadata does not exist, alert the user
-    if (empty($meta)) {
-      drupal_set_message(t('Metadata for live statistics have not been built for this election'), 'warning');
-      return array();
-    }
 
     // Metrics are either arrays of multiple values (like in clubs and
     // societies) or single values (like number of students who have voted).
