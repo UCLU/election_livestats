@@ -183,16 +183,8 @@ function election_livestats_election_vote_undo($account, $post, $election) {
 //@todo Consider abstainers: they are voters but they don't vote
 
 /**
- * Caches metric totals to Redis
+ * Caches metric totals to Redis.
  */
-function election_livestats_form_cache_metadata($form, &$form_state) {
-  $election = $form_state['build_info']['args'][0];
-
-  election_livestats_cache_metadata($election);
-
-  drupal_set_message(t('The metadata was successfully cached.'));
-}
-
 function election_livestats_cache_metadata($election, &$context = NULL) {
 
   if ($context) {
@@ -244,7 +236,7 @@ function election_livestats_metadata_exists($election) {
 }
 
 /**
- * Deletes all Redis keys in given election.
+ * Deletes all Redis keys in given election from a form submission.
  */
 function election_livestats_form_flush_metadata($form, &$form_state) {
   $election = $form_state['build_info']['args'][0];
@@ -254,6 +246,9 @@ function election_livestats_form_flush_metadata($form, &$form_state) {
   drupal_set_message(t('The metadata was successfully flushed.'));
 }
 
+/**
+ * Deletes all Redis keys in given election.
+ */
 function election_livestats_flush_metadata($election) {
 
   $election_id = $election->election_id;
@@ -269,7 +264,7 @@ function election_livestats_flush_metadata($election) {
 }
 
 /**
- * Caches user eligibility to vote
+ * Caches user eligibility to vote from a form submission.
  */
 function election_livestats_form_cache_eligibility($form, &$form_state) {
   $election = $form_state['build_info']['args'][0];
@@ -277,6 +272,9 @@ function election_livestats_form_cache_eligibility($form, &$form_state) {
   return election_livestats_cache_eligibility($election);
 }
 
+/**
+ * Caches user eligibility to vote.
+ */
 function election_livestats_cache_eligibility($election) {
 
   /**
@@ -339,6 +337,9 @@ function election_livestats_cache_eligibility($election) {
   }
 }
 
+/**
+ * Operation used by Batch process in election_livestats_cache_eligibility.
+ */
 function _election_livestats_cache_eligibility_process($election_id, $import_id, $users_chunk, $posts, &$context) {
 
   $context['message'] = "Caching voter eligibility.";
@@ -368,6 +369,9 @@ function _election_livestats_cache_eligibility_process($election_id, $import_id,
   $query->execute();
 }
 
+/**
+ * Callback on completion of Batch process in election_livestats_cache_eligibility.
+ */
 function _election_livestats_cache_eligibility_finished($success, $results, $operations) {
   if ($success) {
     drupal_set_message(t('Eligibility and metadata were successfully cached.'));

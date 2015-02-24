@@ -4,6 +4,9 @@
  * Form for carrying out Livestats actions on an Election.
  */
 
+/**
+ * Implemenets hook_form().
+ */
 function election_livestats_actions_form($form, &$form_state, $election) {
 
   $form['actions'] = array('#type' => 'actions');
