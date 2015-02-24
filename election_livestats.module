@@ -61,7 +61,7 @@ function election_livestats_menu() {
 function election_livestats_show($election) {
   // Any point after the voting has opened, subject to election_access.
   // Election administrators will always be able to see the livestats page.
-  return user_access('administer elections') || (election_access('view', $election) && election_livestats_meta_exists($election) && (REQUEST_TIME >= $election->vopen_time));
+  return user_access('administer elections') || (election_access('view', $election) && election_livestats_metadata_exists($election) && (REQUEST_TIME >= $election->vopen_time));
 }
 
 /**
@@ -185,15 +185,15 @@ function election_livestats_election_vote_undo($account, $post, $election) {
 /**
  * Caches metric totals to Redis
  */
-function election_livestats_form_cache_meta($form, &$form_state) {
+function election_livestats_form_cache_metadata($form, &$form_state) {
   $election = $form_state['build_info']['args'][0];
 
-  election_livestats_cache_meta($election);
+  election_livestats_cache_metadata($election);
 
   drupal_set_message(t('The metadata was successfully cached.'));
 }
 
-function election_livestats_cache_meta($election, &$context = NULL) {
+function election_livestats_cache_metadata($election, &$context = NULL) {
 
   if ($context) {
     $context['message'] = "Calculating metadata for metrics.";
@@ -237,7 +237,7 @@ function election_livestats_cache_meta($election, &$context = NULL) {
 /**
  * Determines whether metadata has been cached for a given election.
  */
-function election_livestats_meta_exists($election) {
+function election_livestats_metadata_exists($election) {
   $redis = election_livestats_get_redis_client();
   $metakey = election_livestats_get_redis_key($election->election_id, "cached");
   return (bool) $redis->get($metakey);
@@ -246,15 +246,15 @@ function election_livestats_meta_exists($election) {
 /**
  * Deletes all Redis keys in given election.
  */
-function election_livestats_form_flush_meta($form, &$form_state) {
+function election_livestats_form_flush_metadata($form, &$form_state) {
   $election = $form_state['build_info']['args'][0];
 
-  election_livestats_flush_meta($election);
+  election_livestats_flush_metadata($election);
 
   drupal_set_message(t('The metadata was successfully flushed.'));
 }
 
-function election_livestats_flush_meta($election) {
+function election_livestats_flush_metadata($election) {
 
   $election_id = $election->election_id;
 
