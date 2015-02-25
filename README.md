@@ -8,7 +8,7 @@ Requirements
 
 * Node.js (or io.js)
 * npm
-* Redis
+* Redis (>= 2.2.1)
 * [phpredis](https://github.com/phpredis/phpredis)
 
 Installation
@@ -26,6 +26,7 @@ This module requires metrics to be implemented via `hook_election_livestats_metr
 
 There is also a "view election live statistics" permission that you will need to configure before the live statistics page is visible.
 
+You may need to open port 3000 on your firewall (e.g. on Ubuntu, `ufw allow 3000/tcp`).
 
 Running
 -------
