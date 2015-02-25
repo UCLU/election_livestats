@@ -340,7 +340,7 @@ function election_livestats_cache_eligibility($election) {
     $batch['operations'][] = array('_election_livestats_cache_eligibility_process', array($election_id, $import_id, $users_chunk, $posts));
   }
 
-  $batch['operations'][] = array('election_livestats_cache_meta', array($election));
+  $batch['operations'][] = array('election_livestats_cache_metadata', array($election));
 
   // Start the batch process.
   batch_set($batch);
