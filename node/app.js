@@ -34,7 +34,7 @@ try {
 
 // Start HTTPS and socket.io
 var io = sio.listen(server);
-server.listen(config.port, "localhost", function(error) {
+server.listen(config.port, config.host, function(error) {
   if(error) {
     console.log("Could not start websocket server.");
     process.exit(1);
