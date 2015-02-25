@@ -128,8 +128,13 @@ function election_livestats_metrics() {
   }
   array_multisort($weights, array_keys($metrics), $metrics);
 
+  // We can do this until we get array_column().
+  $array_column = function($element){
+    return $element['name'];
+  };
+
   // Return flat array of class names.
-  return array_column($metrics, 'name');
+  return array_map($array_column, $metrics);
 }
 
 /**
