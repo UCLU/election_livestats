@@ -156,10 +156,16 @@ function election_livestats_page($election) {
     'type' => 'inline',
   ));
 
-  // Load the rest of the JavaScript.
-  drupal_add_js($socket_io_url . '/socket.io/socket.io.js');
-  drupal_add_js($module_location . '/js/highcharts.js');
-  drupal_add_js($module_location . '/js/livestats.js');
+  if (($library = libraries_load('highcharts')) && !empty($library['loaded'])) {
+    // Load socket.io served by the node server.
+    drupal_add_js($socket_io_url . '/socket.io/socket.io.js');
+
+    // Load our JavaScript.
+    drupal_add_js($module_location . '/js/livestats.js');
+  } else {
+    dpm($library);
+    drupal_set_message('Highcharts library is not installed.','error');
+  }
 
   return array(
     'noscript' => array(

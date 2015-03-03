@@ -3,6 +3,7 @@ description = Live Statistics for the Elections module
 core = 7.x
 
 dependencies[] = election
+dependencies[] = libraries
 
 files[] = election_livestats.admin.inc
 files[] = election_livestats.actions.inc

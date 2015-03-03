@@ -17,7 +17,7 @@ Installation
 * Install Drupal module and configure.
 * Run `npm install` in `node/` folder
 * Set your configuration in `node/config.json`. You can do this by renaming or copying `config.json.example`.
-
+* Install [Highcharts v4.1.1](http://code.highcharts.com/zips/Highcharts-4.1.1.zip). The Libraries module has [a good FAQ](https://www.drupal.org/node/1440066) on installing external libraries.
 
 Configuration
 -------------

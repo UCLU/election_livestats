@@ -79,6 +79,29 @@ function election_livestats_permission() {
 }
 
 /**
+ * Implements hook_libraries_info().
+ */
+function election_livestats_libraries_info() {
+  $libraries['highcharts'] = array(
+    'name' => 'Highcharts',
+    'vendor url' => 'http://highcharts.com/',
+    'download url' => 'http://code.highcharts.com/zips/Highcharts-4.1.1.zip',
+    'version arguments' => array(
+      'file' => 'js/highcharts.js',
+      'pattern' => '/Highcharts JS v(\d+\.\d+\.\d+) /',
+    ),
+    'files' => array(
+      'js' => array('js/highcharts.js'),
+    ),
+    'versions' => array(
+      '4.1.1' => array(),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
  * Returns a prefixed redis key name for a given key string and election id.
  */
 function election_livestats_get_redis_key($election, $key) {
