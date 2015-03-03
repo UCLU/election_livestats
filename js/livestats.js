@@ -1,3 +1,8 @@
+/**
+ * @file
+ * Client-side script controlling the display of the live statistics.
+ */
+
 (function ($, Drupal) {
 
   'use strict';
@@ -10,7 +15,7 @@
       var $statistics = $("<div id='statistics'>");
       $('#noscript-statistics').after($statistics).remove();
 
-      // Run through the initial data to create the charts for each metric
+      // Run through the initial data to create the charts for each metric.
       initial_data.forEach(function(metric){
 
         var $section = $("<div>").attr('id', 'section-' + metric.name).appendTo($statistics);

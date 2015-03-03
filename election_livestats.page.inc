@@ -9,7 +9,7 @@
  */
 function election_livestats_page($election) {
 
-  // If the metadata does not exist, alert the user
+  // If the metadata does not exist, alert the user.
   if (!election_livestats_metadata_exists($election)) {
     drupal_set_message(t('Metadata for live statistics have not been built for this election.'), 'warning');
     return array();
@@ -37,10 +37,10 @@ function election_livestats_page($election) {
 
     $rows = array();
 
-    // Instantiate metric
+    // Instantiate metric.
     $metric = new $class_name();
 
-    // Get the metric label
+    // Get the metric label.
     $name = $metric->getName();
     $label  = $metric->getLabel();
 
@@ -144,7 +144,7 @@ function election_livestats_page($election) {
 
   $module_location = drupal_get_path('module', 'election_livestats');
 
-  // Socket.io variables
+  // Socket.io variables.
   $prot = variable_get("election_livestats_ssl", TRUE) ? "https" : "http";
   $host = variable_get("election_livestats_host", parse_url($GLOBALS['base_url'], PHP_URL_HOST));
   $port = variable_get("election_livestats_port", 3000);
