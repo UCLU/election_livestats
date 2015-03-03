@@ -27,7 +27,7 @@ function election_livestats_page($election) {
   // Start the array that will contain initial json for the frontend.
   $metrics_json = array();
 
-  // Update Redis for each metric.
+  // Query Redis for each metric.
   foreach (election_livestats_metrics() as $class_name) {
 
     // Begin the array of the table and the rows for this metric.
