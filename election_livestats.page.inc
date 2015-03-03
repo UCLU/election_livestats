@@ -55,7 +55,6 @@ function election_livestats_page($election) {
     // Metrics are either arrays of multiple values (like in clubs and
     // societies) or single values (like number of students who have voted).
     // They need to be formatted differently.
-
     $type = $meta['type'];
 
     switch ($type) {
@@ -99,7 +98,7 @@ function election_livestats_page($election) {
         $table['#header'] = array('Value', 'Total');
 
         $rows[] = array(
-          (empty($data))? 0 : $data,
+          (empty($data)) ? 0 : $data,
           $total,
         );
 
@@ -110,7 +109,7 @@ function election_livestats_page($election) {
         $table['#header'] = array('Value');
 
         $rows[] = array(
-          (empty($data))? 0 : $data,
+          (empty($data)) ? 0 : $data,
         );
 
         break;

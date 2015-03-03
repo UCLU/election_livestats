@@ -15,4 +15,3 @@ interface ElectionLiveStatsMetricInterface {
   public function decrement($data);
   public function total($election);
 }
-

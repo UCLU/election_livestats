@@ -111,11 +111,11 @@
           var total = metric.total;
 
           // Avoid NaN if the total possible is zero.
-          var ratio = (total === 0) ? 0 : value/total;
+          var ratio = (total === 0) ? 0 : value / total;
 
           var data = [{
             name: ' ',
-            label: value + '/' + total + ' (' + Math.round(ratio*100) + '%)',
+            label: value + '/' + total + ' (' + Math.round(ratio * 100) + '%)',
             y: ratio
           }];
 
@@ -136,11 +136,11 @@
             var total = metric.total[id].value;
 
             // Avoid NaN if the total possible is zero.
-            var ratio = (total === 0) ? 0 : value/total;
+            var ratio = (total === 0) ? 0 : value / total;
 
             data.push({
               name: metric.total[id].label,
-              label: value + '/' + total + ' (' + Math.round(ratio*100) + '%)',
+              label: value + '/' + total + ' (' + Math.round(ratio * 100) + '%)',
               y: ratio
             });
             bg.push({ y: 1 });
@@ -164,7 +164,6 @@
           $section.children().eq(1).text(metric.value);
         }
 
-
       }
 
     }
@@ -172,5 +171,3 @@
   };
 
 }(jQuery, Drupal));
-
-
