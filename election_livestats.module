@@ -146,7 +146,7 @@ function election_livestats_handle_vote($method, $account, $post, $election, $ti
   $redis = election_livestats_get_redis_client();
 
   // Find if this account has voted in this election.
-  $has_voted = (bool) db_query_range("SELECT 1 FROM {election_ballot} WHERE `election_id` = :election_id AND `uid` = :uid AND `valid` = 1 AND `post_id` <> :post_id AND `timestamp` < :timestamp", array(
+  $has_voted = (bool) db_query_range("SELECT 1 FROM {election_ballot} WHERE `election_id` = :election_id AND `uid` = :uid AND `value` >= 1 AND `post_id` <> :post_id AND `timestamp` < :timestamp", array(
     ':election_id' => $election->election_id,
     ':uid' => $account->uid,
     ':post_id' => $post->post_id,
