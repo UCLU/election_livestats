@@ -162,9 +162,9 @@ function election_livestats_page($election) {
 
     // Load our JavaScript.
     drupal_add_js($module_location . '/js/livestats.js');
-  } else {
-    dpm($library);
-    drupal_set_message('Highcharts library is not installed.','error');
+  }
+  else {
+    drupal_set_message('Highcharts library is not installed.', 'error');
   }
 
   return array(
