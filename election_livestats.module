@@ -315,6 +315,14 @@ function election_livestats_cache_eligibility($election) {
   $posts = election_post_load_by_election($election);
   $election_id = $election->election_id;
 
+  /*
+  @todo Determine whether it's acceptable to get user IDs by eligible roles
+        Details follow...
+
+  We can reduce the uids to those that have any of the eligible roles,
+  but this can give incorrect totals for students because student user
+  accounts are only granted the UCLU Member role on first login via UCL.
+
   // List of unique roles required
   $roles = array_reduce($posts, function ($results, $post) {
     return (array) $results[0] + array_combine($post->rids, $post->rids);
@@ -326,7 +334,14 @@ function election_livestats_cache_eligibility($election) {
   $user_query->condition('ur.rid', $roles);
   $user_query->addField('u', 'uid');
   $user_query->groupBy('uid');
+  */
 
+  // Get all user IDs.
+  $user_query = db_select('users', 'u');
+  $user_query->fields('u', array('uid'));
+  $user_query->distinct();
+
+  // Chunk user IDs.
   $users_chunks = array_chunk($user_query->execute()->fetchCol(), $chunk_size);
 
   // Prepare a batch operation to check voting eligibility for each user.
