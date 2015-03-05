@@ -1,11 +1,15 @@
 Election Livestats
 ==================
+Election Livestats is a module for Drupal 7 that extends the Election
+module to provide live statistics.
 
-Because this module uses Node.js, there are some additional installation and running steps.
+Dependencies
+-------------
+* Election (http://drupal.org/project/election)
+* Libraries API (http://drupal.org/project/libraries)
 
-Requirements
--------------------
-
+Software Requirements
+---------------------
 * Node.js (or io.js)
 * npm
 * Redis (>= 2.2.1)
@@ -13,7 +17,6 @@ Requirements
 
 Installation
 ------------
-
 * Install Drupal module and configure.
 * Run `npm install` in `node/` folder
 * Set your configuration in `node/config.json`. You can do this by renaming or copying `config.json.example`.
@@ -21,7 +24,6 @@ Installation
 
 Configuration
 -------------
-
 This module requires metrics to be implemented via `hook_election_livestats_metrics_alter`. An example metric "Total votes" is included by way of example. Documentation on the structure of metric classes is to come.
 
 There is also a "view election live statistics" permission that you will need to configure before the live statistics page is visible.
@@ -30,7 +32,6 @@ You may need to open port 3000 on your firewall (e.g. on Ubuntu, `ufw allow 3000
 
 Running
 -------
-
 * Start Redis server.
 * Start the `app.js` file in the `node/` subdirectory of the module.<br />*Note: If the certificates are in a read-protected directory, the app will need to be run in `sudo`*.
 * For every election for which you want to have live statistics, you will need go to `election/%election_id/stats/actions` and `Cache eligibility and metadata.`. Depending on your electorate size, this may take some time.
@@ -43,5 +44,4 @@ Alternatively, the upstart script `node/election_livestats_node.conf` is include
 
 Security Considerations
 -----------------------
-
 Please note that currently there is no authentication on the websocket server. As a result, even if your election is only visible to certain users, anyone could connect to the websocket server and receive live statistics updates.
