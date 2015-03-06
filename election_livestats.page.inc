@@ -164,7 +164,7 @@ function election_livestats_page($election) {
     drupal_add_js($module_location . '/js/livestats.js');
   }
   else {
-    drupal_set_message('Highcharts library is not installed.', 'error');
+    drupal_set_message(t('Highcharts library is not installed.'), 'error');
   }
 
   return array(

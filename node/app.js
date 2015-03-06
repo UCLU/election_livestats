@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // @codingStandardsIgnoreFile
 
-// Require dependant libraries and config.
+// Require dependent libraries and config.
 var config = require('./config.json');
 var redis = require('redis');
 var sio = require('socket.io');
