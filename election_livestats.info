@@ -5,12 +5,6 @@ core = 7.x
 dependencies[] = election
 dependencies[] = libraries
 
-files[] = election_livestats.admin.inc
-files[] = election_livestats.actions.inc
-files[] = election_livestats.rules.inc
-files[] = election_livestats.drush.inc
-files[] = election_livestats.page.inc
-
 files[] = exception.inc
 files[] = metricinterface.inc
 files[] = metricbase.inc

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+// @codingStandardsIgnoreFile
 
-// Require dependant libraries and config
+// Require dependant libraries and config.
 var config = require('./config.json');
 var redis = require('redis');
 var sio = require('socket.io');
@@ -13,10 +14,12 @@ try {
     key: fs.readFileSync(config.ssl.key),
     cert: fs.readFileSync(config.ssl.cert)
   });
-} catch (e) {
+}
+catch (e) {
   if (e.errno === 3) {
     console.log("Your SSL key or certificate cannot be read. If they are in a read-protected directory, you will need to run the application with sudo (or equivalent).");
-  } else {
+  }
+  else {
     console.dir(e);
   }
   process.exit(1);
@@ -27,7 +30,8 @@ try {
 try {
   var subscriber = redis.createClient(config.redis.port, config.redis.host);
   var regular = redis.createClient(config.redis.port, config.redis.host);
-} catch (e) {
+}
+catch (e) {
   console.log("There was an error connecting to Redis.");
   process.exit(1);
 }
@@ -35,10 +39,11 @@ try {
 // Start HTTPS and socket.io
 var io = sio.listen(server);
 server.listen(config.port, config.host, function(error) {
-  if(error) {
+  if (error) {
     console.log("Could not start websocket server.");
     process.exit(1);
-  } else {
+  }
+  else {
     console.log("Websocket server started successfully!");
   }
 });
@@ -69,17 +74,17 @@ subscriber.on("message", function(channel, message) {
   var metric = message.metric;
 
   var value_key = getRedisKey(election, metric);
-  var meta_key = getRedisKey(election, "meta-"+metric);
+  var meta_key = getRedisKey(election, "meta-" + metric);
 
   regular.get(value_key, function(err, value){
 
-    if(value !== null) {
+    if (value !== null) {
 
       value = JSON.parse(value);
 
       regular.get(meta_key, function(err, meta){
 
-        if(meta !== null) {
+        if (meta !== null) {
 
           meta = JSON.parse(meta);
 
@@ -100,7 +105,6 @@ subscriber.on("message", function(channel, message) {
               io.to(payload.election).emit('update', payload);
             });
           })(payload);
-
 
         }
 
@@ -125,13 +129,14 @@ function Queue() {
       return timeout._idleStart + timeout._idleTimeout - Date.now();
     };
 
-    if(queued[unique] !== undefined) {
+    if (queued[unique] !== undefined) {
 
       time = getTimeLeft(queued[unique]);
 
       clearTimeout(queued[unique]);
 
-    } else {
+    }
+    else {
 
       time = 2000;
 

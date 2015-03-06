@@ -23,7 +23,7 @@
 
         var $chart = $("<div>").addClass("chart").appendTo($section);
 
-        if(metric.type === "single" || metric.type === "grouped") {
+        if (metric.type === "single" || metric.type === "grouped") {
 
           $chart.highcharts({
             credits: false,
@@ -102,14 +102,15 @@
           update(data);
 
         });
-      } catch (e) {
+      }
+      catch (e) {
         $statistics.before('<div class="messages error">The live statistics server is currently not running</b>. Please refresh this page for updates!</div>');
       }
 
       function update(metric) {
         var $section = $('#section-' + metric.name);
 
-        if(metric.type === "single") {
+        if (metric.type === "single") {
           var height = 80;
 
           var value = metric.value;
@@ -129,13 +130,14 @@
           chart.series[1].setData(data);
 
           chart.setSize(chart.chartWidth, height);
-        } else if(metric.type === "grouped") {
+        }
+        else if (metric.type === "grouped") {
           var height = 40 * Object.keys(metric.total).length;
 
           var data = [];
           var bg = [];
 
-          for(var id in metric.total) {
+          for (var id in metric.total) {
 
             var value = metric.value[id];
             var total = metric.total[id].value;
@@ -152,11 +154,13 @@
           }
 
           data.sort(function(a, b) {
-            if(a.y < b.y) {
+            if (a.y < b.y) {
               return 1;
-            }else if(a.y > b.y) {
+            }
+            else if (a.y > b.y) {
               return -1;
-            }else{
+            }
+            else {
               return 0;
             }
           });
@@ -165,7 +169,8 @@
           chart.series[0].setData(bg);
           chart.series[1].setData(data);
           chart.setSize(chart.chartWidth, height);
-        } else if(metric.type === "count") {
+        }
+        else if (metric.type === "count") {
           $section.children().eq(1).text(metric.value);
         }
 

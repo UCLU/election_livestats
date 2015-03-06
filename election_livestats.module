@@ -1,7 +1,9 @@
 <?php
 /**
  * @file
- * Main module file for the election_livestats module
+ * Main module file for the election_livestats module.
+ *
+ * @todo Consider abstainers: they are voters but they don't vote.
  */
 
 /**
@@ -69,6 +71,9 @@ function election_livestats_view($election, $account = NULL) {
   return user_access('administer elections') || (user_access('view election live statistics', $account) && election_access('view', $election) && election_livestats_metadata_exists($election) && (REQUEST_TIME >= $election->vopen_time));
 }
 
+/**
+ * Implements hook_permission().
+ */
 function election_livestats_permission() {
   return array(
     'view election live statistics' => array(
@@ -152,7 +157,7 @@ function election_livestats_metrics() {
   array_multisort($weights, array_keys($metrics), $metrics);
 
   // We can do this until we get array_column().
-  $array_column = function($element){
+  $array_column = function($element) {
     return $element['name'];
   };
 
@@ -190,7 +195,7 @@ function election_livestats_handle_vote($method, $account, $post, $election, $ti
     // Note that this will return false if the key does not exist.
     $data = json_decode($redis->get($key), TRUE);
 
-    // Pass data to the metric and save the result
+    // Pass data to the metric and save the result.
     $new_data = $metric->$method($data);
 
     $redis->set($key, json_encode($new_data));
@@ -221,8 +226,6 @@ function election_livestats_election_vote_undo($account, $post, $election) {
   election_livestats_handle_vote("decrement", $account, $post, $election);
 
 }
-
-//@todo Consider abstainers: they are voters but they don't vote
 
 /**
  * Caches metric totals to Redis.
@@ -319,7 +322,7 @@ function election_livestats_form_cache_eligibility($form, &$form_state) {
  */
 function election_livestats_cache_eligibility($election) {
 
-  /**
+  /*
    * @todo This should scale with processing power of computer (i.e. maximum
    * number of users that can be loaded via user_load_multiple in 30 seconds
    * (maximum execution time). This number works on my PC, but ideally we
@@ -327,37 +330,41 @@ function election_livestats_cache_eligibility($election) {
    */
   $chunk_size = 1500;
 
-  // Choose a new import id
+  // Choose a new import id.
   $import_id = db_query("SELECT MAX(import_id) as import_id FROM {election_livestats_eligibility}")->fetchField() + 1;
 
-  // For a member to be counted as able to vote they need to pass at least
-  // one eligibility criterion.
-  // First we'll collect together all the criteria to then test against
-  // each member.
+  /*
+   * For a member to be counted as able to vote they need to pass at least
+   * one eligibility criterion.
+   *
+   * First we'll collect together all the criteria to then test against
+   * each member.
+   */
 
   $posts = election_post_load_by_election($election);
   $election_id = $election->election_id;
 
   /*
-  @todo Determine whether it's acceptable to get user IDs by eligible roles
-        Details follow...
-
-  We can reduce the uids to those that have any of the eligible roles,
-  but this can give incorrect totals for students because student user
-  accounts are only granted the UCLU Member role on first login via UCL.
-
-  // List of unique roles required
-  $roles = array_reduce($posts, function ($results, $post) {
-    return (array) $results[0] + array_combine($post->rids, $post->rids);
-  });
-
-  // Select users from these roles.
-  $user_query = db_select('users', 'u');
-  $user_query->leftJoin('users_roles', 'ur', 'u.uid = ur.uid');
-  $user_query->condition('ur.rid', $roles);
-  $user_query->addField('u', 'uid');
-  $user_query->groupBy('uid');
-  */
+   * @todo Determine whether it's acceptable to get user IDs by eligible
+   * role.
+   *
+   * We can reduce the uids to those that have any of the eligible roles,
+   * but this can give incorrect totals for students because student user
+   * accounts are only granted the UCLU Member role on first login via UCL.
+   *
+   * // List of unique roles required
+   *
+   * $roles = array_reduce($posts, function ($results, $post) {
+   *   return (array) $results[0] + array_combine($post->rids, $post->rids);
+   * });
+   *
+   * // Select users from these roles.
+   * $user_query = db_select('users', 'u');
+   * $user_query->leftJoin('users_roles', 'ur', 'u.uid = ur.uid');
+   * $user_query->condition('ur.rid', $roles);
+   * $user_query->addField('u', 'uid');
+   * $user_query->groupBy('uid');
+   */
 
   // Get all user IDs.
   $user_query = db_select('users', 'u');
@@ -380,7 +387,10 @@ function election_livestats_cache_eligibility($election) {
 
   // Build the operations array.
   foreach ($users_chunks as $users_chunk) {
-    $batch['operations'][] = array('_election_livestats_cache_eligibility_process', array($election_id, $import_id, $users_chunk, $posts));
+    $batch['operations'][] = array(
+      '_election_livestats_cache_eligibility_process',
+      array($election_id, $import_id, $users_chunk, $posts),
+    );
   }
 
   $batch['operations'][] = array('election_livestats_cache_metadata', array($election));
@@ -402,7 +412,10 @@ function _election_livestats_cache_eligibility_process($election_id, $import_id,
   $context['message'] = "Caching voter eligibility.";
 
   $query = db_insert('election_livestats_eligibility')->fields(array(
-    'uid', 'election_id', 'eligible', 'import_id'
+    'uid',
+    'election_id',
+    'eligible',
+    'import_id',
   ));
 
   $users = user_load_multiple($users_chunk);
@@ -416,7 +429,7 @@ function _election_livestats_cache_eligibility_process($election_id, $import_id,
           'uid' => $user->uid,
           'election_id' => $election_id,
           'eligible' => TRUE,
-          'import_id' => $import_id
+          'import_id' => $import_id,
         ));
         break;
       }
@@ -427,7 +440,7 @@ function _election_livestats_cache_eligibility_process($election_id, $import_id,
 }
 
 /**
- * Callback on completion of Batch process in election_livestats_cache_eligibility.
+ * Batch process completion callback.
  */
 function _election_livestats_cache_eligibility_finished($success, $results, $operations) {
   if ($success) {

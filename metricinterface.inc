@@ -48,4 +48,5 @@ interface ElectionLiveStatsMetricInterface {
    * Classes should define a method for calculating total possible value.
    */
   public function total($election);
+
 }
