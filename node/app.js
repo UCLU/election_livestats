@@ -17,10 +17,10 @@ try {
 }
 catch (e) {
   if (e.errno === 3) {
-    console.log("Your SSL key or certificate cannot be read. If they are in a read-protected directory, you will need to run the application with sudo (or equivalent).");
+    console.error("Your SSL key or certificate cannot be read. If they are in a read-protected directory, you will need to run the application with sudo (or equivalent).");
   }
   else {
-    console.dir(e);
+    console.error(e);
   }
   process.exit(1);
 }
@@ -32,7 +32,7 @@ try {
   var regular = redis.createClient(config.redis.port, config.redis.host);
 }
 catch (e) {
-  console.log("There was an error connecting to Redis.");
+  console.error("There was an error connecting to Redis.");
   process.exit(1);
 }
 
@@ -40,7 +40,7 @@ catch (e) {
 var io = sio.listen(server);
 server.listen(config.port, config.host, function(error) {
   if (error) {
-    console.log("Could not start websocket server.");
+    console.error("Could not start websocket server.");
     process.exit(1);
   }
   else {
