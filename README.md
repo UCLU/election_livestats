@@ -3,27 +3,29 @@ Election Livestats
 Election Livestats is a module for Drupal 7 that extends the Election
 module to provide live statistics.
 
+Note that all version numbers provided for dependencies or requirements
+reflect the development environment and can be substituted for other
+versions with compatable APIs.
+
 Dependencies
 -------------
-* Election (http://drupal.org/project/election)
-* Libraries API (http://drupal.org/project/libraries)
+* Election 7.x-1.0-beta25  (http://drupal.org/project/election)
+* Libraries API 7.x-2.2 (http://drupal.org/project/libraries)
 
 Software Requirements
 ---------------------
-* Node.js (or io.js)
-* npm
-* Redis (>= 2.2.1)
-* [phpredis](https://github.com/phpredis/phpredis)
+* Node.js v0.10.33
+* npm v1.4.28
+* Redis v2.2.1
+* [phpredis] v2.2.7 (https://github.com/phpredis/phpredis)
+* [Highcharts v4.1.1](http://code.highcharts.com/zips/Highcharts-4.1.1.zip).
 
 Installation
 ------------
-* Install Drupal module and configure.
 * Run `npm install` in `node/` folder
 * Set your configuration in `node/config.json`. You can do this by
 renaming or copying `config.json.example`.
-* Install
-[Highcharts v4.1.1](http://code.highcharts.com/zips/Highcharts-4.1.1.zip).
-The Libraries module has [a good FAQ](https://www.drupal.org/node/1440066)
+* Install the Highcharts library. The Libraries module has [a good FAQ](https://www.drupal.org/node/1440066)
 on installing external libraries.
 
 Configuration
