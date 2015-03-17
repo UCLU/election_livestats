@@ -121,22 +121,14 @@ function election_livestats_get_redis_key($election, $key) {
  * Returns a reference to the redis client.
  */
 function election_livestats_get_redis_client() {
-  static $redis, $config;
-  if (!isset($config)) {
-    $config = array();
-    $config_path = drupal_get_path('module', 'election_livestats') . '/node/config.json';
-    if (is_readable($config_path)) {
-      $config = (array) json_decode(file_get_contents($config_path), TRUE);
-    }
-  }
-  if (!isset($redis)) {
-    $redis = new Redis();
-    $host = !empty($config['redis']['host']) ? $config['redis']['host'] : '127.0.0.1';
-    $port = !empty($config['redis']['port']) ? $config['redis']['port'] : NULL;
-    $connected = $redis->connect($host, $port);
-    if (!$connected) {
-      watchdog("election_livestats", "Redis is not running", array(), WATCHDOG_ERROR);
-    }
+
+  $redis = new Redis();
+  $connected = $redis->connect('127.0.0.1');
+
+  if (!$connected) {
+
+    watchdog("election_livestats", "Redis is not running", array(), WATCHDOG_ERROR);
+
   }
 
   return $redis;
