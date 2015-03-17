@@ -62,13 +62,11 @@ var q = new Queue();
 
 // Subscribe clients to channels based on their election id.
 io.on('connection', function(socket){
-
   socket.on('subscribe', function(election) {
 
     socket.join(election);
 
   });
-
 });
 
 // Subscribe to the redis pubsub to receive update notifications from PHP.
@@ -76,7 +74,6 @@ subscriber.subscribe("election_livestats");
 
 // When we get a notification from PHP, send to clients in appropriate room.
 subscriber.on("message", function(channel, message) {
-
   message = JSON.parse(message);
 
   var election = message.election;
@@ -86,15 +83,11 @@ subscriber.on("message", function(channel, message) {
   var meta_key = getRedisKey(election, "meta-" + metric);
 
   regular.get(value_key, function(err, value){
-
     if (value !== null) {
-
       value = JSON.parse(value);
 
       regular.get(meta_key, function(err, meta){
-
         if (meta !== null) {
-
           meta = JSON.parse(meta);
 
           var payload = {
@@ -103,10 +96,10 @@ subscriber.on("message", function(channel, message) {
             "label": meta.label,
             "value": value,
             "type": meta.type
-          }
+          };
 
           if (meta.total !== undefined) {
-            payload['total'] = meta.total;
+            payload.total = meta.total;
           }
 
           (function(payload) {
@@ -114,15 +107,10 @@ subscriber.on("message", function(channel, message) {
               io.to(payload.election).emit('update', payload);
             });
           })(payload);
-
         }
-
       });
-
     }
-
   });
-
 });
 
 // Introduce a delay to ensure that we don't lots of updates to the same data.
@@ -131,7 +119,6 @@ function Queue() {
   var queued = [];
 
   this.add = function(unique, callback) {
-
     var time;
 
     var getTimeLeft = function(timeout) {
@@ -139,27 +126,20 @@ function Queue() {
     };
 
     if (queued[unique] !== undefined) {
-
       time = getTimeLeft(queued[unique]);
 
       clearTimeout(queued[unique]);
-
     }
     else {
-
       time = 2000;
-
     }
 
     queued[unique] = setTimeout(callback, time);
-
-  }
+  };
 
 }
 
 // Analogous to election_livestats_get_redis_key($key).
 function getRedisKey(election, metric){
-
-  return key = config.prefix + "-" + election + "-" + metric;
-
+  return config.prefix + "-" + election + "-" + metric;
 }
