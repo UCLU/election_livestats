@@ -9,7 +9,8 @@ versions with compatable APIs.
 
 Dependencies
 -------------
-* Election 7.x-1.0-beta25  (http://drupal.org/project/election)
+* Election 7.x-1.0-beta25  (http://drupal.org/project/election) with
+[patch 2387261](https://www.drupal.org/node/2387261).
 * Libraries API 7.x-2.2 (http://drupal.org/project/libraries)
 
 Software Requirements
