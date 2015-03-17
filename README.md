@@ -45,7 +45,7 @@ You may need to open port 3000 on your firewall (e.g. on Ubuntu,
 Running
 -------
 * Start Redis server.
-* Start the `app.js` file in the `node/` subdirectory of the module.
+* Run `node node/app.js`.
 <br />*Note: If the certificates are in a read-protected directory, the
 app will need to be run in `sudo`*.
 * For every election for which you want to have live statistics, you
