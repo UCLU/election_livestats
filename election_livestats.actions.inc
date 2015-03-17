@@ -8,7 +8,6 @@
  * Implemenets hook_form().
  */
 function election_livestats_actions_form($form, &$form_state, $election) {
-
   $form['actions'] = array('#type' => 'actions');
 
   $form['actions']['cache_eligibility'] = array(
@@ -18,5 +17,13 @@ function election_livestats_actions_form($form, &$form_state, $election) {
   );
 
   return $form;
+}
 
+/**
+ * Caches user eligibility to vote from a form submission.
+ */
+function election_livestats_form_cache_eligibility($form, &$form_state) {
+  $election = $form_state['build_info']['args'][0];
+
+  return election_livestats_cache_eligibility($election);
 }

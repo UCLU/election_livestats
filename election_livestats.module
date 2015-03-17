@@ -317,15 +317,6 @@ function election_livestats_flush_metadata($election) {
 }
 
 /**
- * Caches user eligibility to vote from a form submission.
- */
-function election_livestats_form_cache_eligibility($form, &$form_state) {
-  $election = $form_state['build_info']['args'][0];
-
-  return election_livestats_cache_eligibility($election);
-}
-
-/**
  * Caches user eligibility to vote.
  */
 function election_livestats_cache_eligibility($election) {
