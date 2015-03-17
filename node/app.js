@@ -6,23 +6,32 @@ var config = require('./config.json');
 var redis = require('redis');
 var sio = require('socket.io');
 var https = require('https');
+var http = require('http');
 var fs = require('fs');
 
-// Configure our HTTPS server to use our keys and certs.
-try {
-  var server = https.createServer({
-    key: fs.readFileSync(config.ssl.key),
-    cert: fs.readFileSync(config.ssl.cert)
-  });
-}
-catch (e) {
-  if (e.errno === 3) {
-    console.error("Your SSL key or certificate cannot be read. If they are in a read-protected directory, you will need to run the application with sudo (or equivalent).");
+// If we are using HTTPS, we need to configure the server to read the
+// certificates, otherwise just create an HTTP server object.
+var server;
+if (config.useSSL) {
+  var params;
+  try {
+    params = {
+      key: fs.readFileSync(config.ssl.key),
+      cert: fs.readFileSync(config.ssl.cert)
+    };
   }
-  else {
-    console.error(e);
+  catch (e) {
+    if (e.errno === 3) {
+      console.error("Your SSL key or certificate cannot be read. If they are in a read-protected directory, you will need to run the application with sudo (or equivalent).");
+    }
+    else {
+      console.error(e);
+    }
+    process.exit(1);
   }
-  process.exit(1);
+  server = https.createServer(params);
+} else {
+  server = http.createServer();
 }
 
 // We need to have two connections, one for subscribing and one for regular
