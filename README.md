@@ -5,7 +5,7 @@ module to provide live statistics.
 
 Note that all version numbers provided for dependencies or requirements
 reflect the development environment and can be substituted for other
-versions with compatable APIs.
+versions with compatible APIs.
 
 Dependencies
 -------------
@@ -26,8 +26,9 @@ Installation
 * Run `npm install` in `node/` folder
 * Set your configuration in `node/config.json`. You can do this by
 renaming or copying `config.json.example`.
-* Install the Highcharts library. The Libraries module has [a good FAQ](https://www.drupal.org/node/1440066)
-on installing external libraries.
+* Install the Highcharts library. The Libraries module has
+[a good FAQ](https://www.drupal.org/node/1440066) on installing external
+libraries.
 
 Configuration
 -------------
